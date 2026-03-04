@@ -20,7 +20,7 @@ async function search(){
 
 let ticker = document.getElementById("stock").value;
 
-let response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=YOUR_API_KEY`);
+let response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=d6jof19r01qkvh5qnrg0d6jof19r01qkvh5qnrgg);
 let data = await response.json();
 
 document.getElementById("result").innerHTML =
