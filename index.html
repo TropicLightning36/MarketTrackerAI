@@ -1,35 +1,56 @@
 index.html
-
 <!DOCTYPE html>
 <html>
 <head>
-<title>MarketTrackerAI</title>
+  <meta charset="utf-8" />
+  <title>MarketTrackerAI</title>
 </head>
 
 <body style="font-family:Arial; text-align:center; margin-top:100px;">
+  <h1>MarketTrackerAI</h1>
 
-<h1>MarketTrackerAI</h1>
+  <input id="stock" placeholder="Enter stock ticker (AAPL)" />
+  <button id="btn">Search</button>
 
-<input id="stock" placeholder="Enter stock ticker (AAPL)">
-<button onclick="search()">Search</button>
+  <p id="result" style="margin-top:16px;"></p>
 
-<p id="result"></p>
+  <script>
+    const btn = document.getElementById("btn");
+    const result = document.getElementById("result");
 
-<script>
-async function search(){
+    btn.addEventListener("click", search);
 
-let ticker = document.getElementById("stock").value;
+    async function search() {
+      const ticker = document.getElementById("stock").value.trim().toUpperCase();
+      result.innerHTML = "Loading...";
 
-let response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=d6jof19r01qkvh5qnrg0d6jof19r01qkvh5qnrgg);
-let data = await response.json();
+      try {
+        // IMPORTANT: replace YOUR_API_KEY with your real Finnhub key
+        const url = `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(ticker)}&token=d6jof19r01qkvh5qnrg0d6jof19r01qkvh5qnrgg`;
+        const response = await fetch(url);
 
-document.getElementById("result").innerHTML =
-`Current Price: $${data.c}<br>
-High Today: $${data.h}<br>
-Low Today: $${data.l}`;
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} ${response.statusText}`);
+        }
 
-}
-</script>
+        const data = await response.json();
 
+        // Finnhub returns 0s if symbol is invalid sometimes
+        if (!data || (data.c === 0 && data.h === 0 && data.l === 0)) {
+          result.innerHTML = `No data returned. Check the ticker (try AAPL) and your API key.`;
+          return;
+        }
+
+        result.innerHTML = `
+          <strong>${ticker}</strong><br>
+          Current Price: $${data.c}<br>
+          High Today: $${data.h}<br>
+          Low Today: $${data.l}
+        `;
+      } catch (err) {
+        result.innerHTML = `<span style="color:crimson;">Error: ${err.message}</span>`;
+      }
+    }
+  </script>
 </body>
 </html>
